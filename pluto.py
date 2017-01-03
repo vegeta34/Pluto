@@ -53,7 +53,7 @@ def playGame():
 
     # Step 3.2: run the game
     while 1!= 0:
-        env.render()
+        #env.render()
         action = brain.getAction()
         #nextObservation,reward,terminal = flappyBird.frame_step(action)
         observation, reward, terminal, _ = env.step(action)

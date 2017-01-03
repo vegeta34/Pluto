@@ -12,12 +12,12 @@ from collections import deque
 # Hyper Parameters:
 FRAME_PER_ACTION = 1
 GAMMA = 0.99 # decay rate of past observations
-OBSERVE = 64. # timesteps to observe before training
+OBSERVE = 100 # timesteps to observe before training
 EXPLORE = 200000. # frames over which to anneal epsilon
 FINAL_EPSILON = 0#0.001 # final value of epsilon
 INITIAL_EPSILON = 0#0.01 # starting value of epsilon
 REPLAY_MEMORY = 50000 # number of previous transitions to remember
-BATCH_SIZE = 32 # size of minibatch
+BATCH_SIZE =32 # size of minibatch
 UPDATE_TIME = 100
 
 class WTDQN:
@@ -41,8 +41,8 @@ class WTDQN:
 		# saving and loading networks
         self.saver = tf.train.Saver()
         self.session = tf.InteractiveSession()
-        #self.session.run(tf.initialize_all_variables())
-        self.session.run(tf.global_variables_initializer())
+        self.session.run(tf.initialize_all_variables())
+        #self.session.run(tf.global_variables_initializer())
         checkpoint = tf.train.get_checkpoint_state("saved_networks")
         if checkpoint and checkpoint.model_checkpoint_path:
             self.saver.restore(self.session, checkpoint.model_checkpoint_path)
@@ -101,7 +101,6 @@ class WTDQN:
         action_batch = [data[1] for data in minibatch]
         reward_batch = [data[2] for data in minibatch]
         nextState_batch = [data[3] for data in minibatch]
-
         # Step 2: calculate y
         y_batch = []
         QValue_batch = self.QValueT.eval(feed_dict={self.stateInputT:nextState_batch})
@@ -111,12 +110,12 @@ class WTDQN:
                 y_batch.append(reward_batch[i])
             else:
                 y_batch.append(reward_batch[i] + GAMMA * np.max(QValue_batch[i]))
-
-            self.trainStep.run(feed_dict={
-                self.yInput : y_batch,
-                self.actionInput : action_batch,
-                self.stateInput : state_batch
-            })
+            
+        self.trainStep.run(feed_dict={
+            self.yInput : y_batch,
+            self.actionInput : action_batch,
+            self.stateInput : state_batch
+        })
 
         # save network every 100000 iteration
         if self.timeStep % 10000 == 0:
