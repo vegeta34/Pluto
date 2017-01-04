@@ -14,8 +14,8 @@ FRAME_PER_ACTION = 4
 GAMMA = 0.99 # decay rate of past observations
 OBSERVE = 100 # timesteps to observe before training
 EXPLORE = 200000. # frames over which to anneal epsilon
-FINAL_EPSILON = 0#0.001 # final value of epsilon
-INITIAL_EPSILON = 0#0.01 # starting value of epsilon
+FINAL_EPSILON = 0.001 # final value of epsilon
+INITIAL_EPSILON = 0.7 # starting value of epsilon
 REPLAY_MEMORY = 50000 # number of previous transitions to remember
 BATCH_SIZE =32 # size of minibatch
 UPDATE_TIME = 100
@@ -49,6 +49,11 @@ class WTDQN:
             print "Successfully loaded:", checkpoint.model_checkpoint_path
         else:
             print "Could not find old network weights"
+
+    def onGameOver(self):
+        # change episilon
+        if self.epsilon > FINAL_EPSILON and self.timeStep > OBSERVE:
+            self.epsilon -= (INITIAL_EPSILON - FINAL_EPSILON)/OBSERVE
 
     def createQNetwork(self):
         # network weights
@@ -164,8 +169,8 @@ class WTDQN:
             action[0] = 1 # do nothing
 
         # change episilon
-        if self.epsilon > FINAL_EPSILON and self.timeStep > OBSERVE:
-            self.epsilon -= (INITIAL_EPSILON - FINAL_EPSILON)/EXPLORE
+        #if self.epsilon > FINAL_EPSILON and self.timeStep > OBSERVE:
+        #    self.epsilon -= (INITIAL_EPSILON - FINAL_EPSILON)/1000
         return action_index
 
     def setInitState(self,observation):

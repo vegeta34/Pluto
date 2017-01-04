@@ -72,6 +72,7 @@ def playGame():
                 time.time()-start_time, reward)),
                 ('' if reward == -1 else ' !!!!!!!!'))
             start_time = time.time()
+            brain.onGameOver()
         if terminal == True:
             episode_number +=1
             game_number = 0
