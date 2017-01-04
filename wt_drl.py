@@ -10,7 +10,7 @@ import random
 from collections import deque
 
 # Hyper Parameters:
-FRAME_PER_ACTION = 1
+FRAME_PER_ACTION = 4
 GAMMA = 0.99 # decay rate of past observations
 OBSERVE = 100 # timesteps to observe before training
 EXPLORE = 200000. # frames over which to anneal epsilon
@@ -144,7 +144,7 @@ class WTDQN:
         else:
             state = "train"
 
-        print "TIMESTEP", self.timeStep, "/ STATE", state, "/ EPSILON", self.epsilon
+        #print "TIMESTEP", self.timeStep, "/ STATE", state, "/ EPSILON", self.epsilon
 
         self.currentState = newState
         self.timeStep += 1

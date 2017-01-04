@@ -51,15 +51,34 @@ def playGame():
     #brain.setInitState(observation0)
     brain.setInitState(observation0)
 
+    game_number = 0
+    episode_number = 0
+    start_time = time.time()
+    reward_sum = 0
+    running_reward = None
     # Step 3.2: run the game
     while 1!= 0:
-        #env.render()
+        env.render()
         action = brain.getAction()
         #nextObservation,reward,terminal = flappyBird.frame_step(action)
-        observation, reward, terminal, _ = env.step(action)
+        observation, reward, terminal, _ = env.step(action + 1)
+        reward_sum += reward
         action_arr = np.zeros(actions)
         action_arr[action] = 1
         brain.setPerception(preprocess(observation),action_arr,reward,terminal)
+        if reward != 0:
+            print (('episode %d: game %d took %.5fs, reward: %f' %
+                (episode_number, game_number,
+                time.time()-start_time, reward)),
+                ('' if reward == -1 else ' !!!!!!!!'))
+            start_time = time.time()
+        if terminal == True:
+            episode_number +=1
+            game_number = 0
+            running_reward = reward_sum if running_reward is None else running_reward * 0.99 + reward_sum * 0.01
+            print('resetting env. episode reward total was %f. running mean: %f' % (reward_sum, running_reward))
+            reward_sum = 0
+            env.reset()
         #nextObservation = preprocess(nextObservation)
         #brain.setPerception(nextObservation,action,reward,terminal)
     """
