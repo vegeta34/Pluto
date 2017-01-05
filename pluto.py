@@ -82,84 +82,20 @@ def playGame():
             env.reset()
         #nextObservation = preprocess(nextObservation)
         #brain.setPerception(nextObservation,action,reward,terminal)
-    """
-    with tf.Session() as sess:
-        init = tf.initialize_all_variables()
-        sess.run(init)
-        #if resume:
-        #    load_params = tl.files.load_npz(name=model_file_name+'.npz')
-        #    tl.files.assign_params(sess, load_params, network)
-        #network.print_params()
-        #network.print_layers()
 
-        start_time = time.time()
-        game_number = 0
-        while True:
-            if render: env.render()
-
-            cur_x = prepro(observation)
-
-            x = cur_x - prev_x if prev_x is not None else np.zeros(D)
-            x = x.reshape(1, D)
-            prev_x = cur_x
-
-            #prob = sess.run(
-            #    sampling_prob,
-            #    feed_dict={states_batch_pl: x}
-            #)
-            # action. 1: STOP  2: UP  3: DOWN
-            #action = np.random.choice([1,2,3], p=prob.flatten())
-            action = brain.getAction()
-
-            observation, reward, done, _ = env.step(action)
-            brain.setPerception(prepro(observation),action,reward,terminal)
-
-            reward_sum += reward
-            xs.append(x)            # all observations in a episode
-            ys.append(action - 1)   # all fake labels in a episode (action begins from 1, so minus 1)
-            rs.append(reward)       # all rewards in a episode
-            if done:
-                episode_number += 1
-                game_number = 0
-
-                if episode_number % batch_size == 0:
-                    print('batch over...... updating parameters......')
-                    epx = np.vstack(xs)
-                    epy = np.asarray(ys)
-                    epr = np.asarray(rs)
-                    disR = tl.rein.discount_episode_rewards(epr, gamma)
-                    disR -= np.mean(disR)
-                    disR /= np.std(disR)
-
-                    xs, ys, rs = [], [], []
-
-                    sess.run(
-                        train_op,
-                        feed_dict={
-                            states_batch_pl: epx,
-                            actions_batch_pl: epy,
-                            discount_rewards_batch_pl: disR
-                        }
-                    )
-
-
-                if episode_number % (batch_size * 100) == 0:
-                    tl.files.save_npz(network.all_params, name=model_file_name+'.npz')
-
-                running_reward = reward_sum if running_reward is None else running_reward * 0.99 + reward_sum * 0.01
-                print('resetting env. episode reward total was %f. running mean: %f' % (reward_sum, running_reward))
-                reward_sum = 0
-                observation = env.reset() # reset env
-                prev_x = None
-
-            if reward != 0:
-                print(('episode %d: game %d took %.5fs, reward: %f' %
-                            (episode_number, game_number,
-                            time.time()-start_time, reward)),
-                            ('' if reward == -1 else ' !!!!!!!!'))
-                start_time = time.time()
-                game_number += 1
-    """
+def irl_process():
+    miu_e = compute_miu(human_data) #miu generated from human data
+    miu = generate_miu(Null)  #null means random play
+    epsilon = 0.001
+    t = 100
+    for True:
+       w, t = irl_linear(miu_e, miu) #linear method irl
+       if t < epsilon:
+           break
+       pi = rl_process(w)  #using Reward function with parameter w
+       miu_tmp = miu
+       miu = generate_miu(pi)
+       miu = miu_tmp + ((miu - miu_tmp)*(miu_e - miu_tmp)/(miu - miu_tmp)*(miu - miu_tmp))*(miu - miu_tmp))
 
 def main():
 	playGame()
