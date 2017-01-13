@@ -2,6 +2,9 @@
 from wt_drl import WTDQN
 import numpy as np
 from device.wetest import device
+import image
+
+MAX_STEPS = 128
 
 #play game using DRL
 def playGame(w):
@@ -11,8 +14,8 @@ def playGame(w):
     #brain = BrainDQN(actions)
     brain = WTDQN(actions)
     # Step 2: init Game
-    env = gym.make("Pong-v0")
-    observation = env.reset()
+    #env = gym.make("Pong-v0")
+    #observation = env.reset()
     #flappyBird = game.GameState()
     # Step 3: play game
     # Step 3.1: obtain init state
@@ -37,7 +40,7 @@ def playGame(w):
         reward_sum += reward
         action_arr = np.zeros(actions)
         action_arr[action] = 1
-        brain.setPerception(preprocess(observation),action_arr,reward,terminal)
+        brain.setPerception(image.preprocess(observation),action_arr,reward,terminal)
         if reward != 0:
             print (('episode %d: game %d took %.5fs, reward: %f' %
                 (episode_number, game_number,
@@ -55,38 +58,3 @@ def playGame(w):
         #nextObservation = preprocess(nextObservation)
         #brain.setPerception(nextObservation,action,reward,terminal)
 
-def process_expert_data(trajectories):
-    print len(trajectories)
-    m = len(trajectories)  #number of trajectories
-    miu = 0
-    for i = 0; i < len(trajectories); i++:
-        currentState = np.stack((observation, observation, observation, observation), axis = 2)
-        for j = 0; j < len(trajectories[i]); j++:
-            currentState = np.append(currentState[:,:,1:],trajectories[i][j],axis = 2)
-            state = np.reshape(currentState,(25600))
-            miu += np.power(GAMMA, j) * state
-    miu = miu / m
-    return miu
-    
-#inverse reinforcement algorithm
-def irl_process():
-    human_data = read_data_from_file()
-    miu_e = process_expert_data(human_data) #miu generated from human data
-    irl_processer = WTIRL(miu_e)
-    miu = irl_processer.generate_miu(None)  #null means random play
-    epsilon = 0.001
-    t = 100
-    for True:
-        w, t = irl_processer.process(miu)
-        if t < epsilon:
-            break
-        drl_runner = WTDRL(w)
-        pi = dl_runner.run()  #using Reward function with parameter w
-        miu_tmp = miu
-        miu = irl_processer.generate_miu(pi)
-
-def main():
-	irl_process()
-
-if __name__ == '__main__':
-	main()
