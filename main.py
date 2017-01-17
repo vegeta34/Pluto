@@ -4,11 +4,11 @@
 #sys.path.append("game/")
 #import wrapped_flappy_bird as game
 #from BrainDQN_Nature import BrainDQN
-from wt_drl import WTDQN
 import numpy as np
 import gym
 import time
 import cv2
+import drl
 
 render = False
 GAMMA = 0.99
@@ -105,8 +105,7 @@ def irl_process():
         w, t = irl_processer.process(miu)
         if t < epsilon:
             break
-        drl_runner = WTDRL(w)
-        pi = dl_runner.run()  #using Reward function with parameter w
+        pi = drl.playGame(w)  #using Reward function with parameter w
         miu_tmp = miu
         miu = irl_processer.generate_miu(pi)
 
