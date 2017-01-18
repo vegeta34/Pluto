@@ -6,12 +6,14 @@ import image
 from collections import deque
 
 MAX_STEPS = 128
+MAX_REWARD_MEMORY_SIZE = 4
 
 #used to calculate reward
 experience_queue = deque()
 
 def getCurrentReward(reward_w):
-    return np.multipy(experience_queue, reward_x)
+    a = np.array(experience_queue[0], experience_queue[1], experience_queue[2], experience_queue[3])
+    return np.dot(a.flatten(), reward_x)
 
 
 #play game using DRL
@@ -26,8 +28,8 @@ def playGame(reward_w):
     #observation = env.reset()
     #flappyBird = game.GameState()
     mydevice = device.get_device()
-    mydevice.launchgame()
-    observation = mydevice.snapshot()
+    mydevice.launch_app()
+    observation = mydevice.screenshot()
     # Step 3: play game
     # Step 3.1: obtain init state
     #action0 = np.array([1,0])  # do nothing
@@ -51,6 +53,8 @@ def playGame(reward_w):
             #observation, reward, terminal, _ = env.step(action + 1)
             mydevice.action(action)
             observation = mydevice.snapshot()
+            if experience_queue.count >= MAX_REWARD_MEMORY_SIZE:
+                experience_queue.popleft()
             experience_queue.append(image.preprocess(observation))
             reward = getCurrentReward()
             reward_sum += reward
@@ -63,6 +67,7 @@ def playGame(reward_w):
                     ('' if reward == -1 else ' !!!!!!!!'))
                 start_time = time.time()
                 brain.onGameOver()
+        experience_queue.clear()
         episode_number +=1
         #game_number = 0
         running_reward = reward_sum if running_reward is None else running_reward * 0.99 + reward_sum * 0.01
