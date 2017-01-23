@@ -28,7 +28,7 @@ def prepro(I):
     I[I == 109] = 0
     I[I != 0] = 1
     return I.astype(np.float).ravel()
-
+'''
 def playGame():
     # Step 1: init BrainDQN
     #actions = 2
@@ -79,12 +79,14 @@ def playGame():
             env.reset()
         #nextObservation = preprocess(nextObservation)
         #brain.setPerception(nextObservation,action,reward,terminal)
+'''
 
 def process_expert_data(trajectories):
     print len(trajectories)
     m = len(trajectories)  #number of trajectories
     miu = 0
-    for i = 0; i < len(trajectories); i++:
+    for i = 1; ; i++:
+
         currentState = np.stack((observation, observation, observation, observation), axis = 2)
         for j = 0; j < len(trajectories[i]); j++:
             currentState = np.append(currentState[:,:,1:],trajectories[i][j],axis = 2)
