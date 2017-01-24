@@ -1,7 +1,7 @@
 
 from wt_drl import WTDQN
 import numpy as np
-from device.wetest import device
+from wetest import device
 import image
 from collections import deque
 
