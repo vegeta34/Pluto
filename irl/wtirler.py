@@ -14,13 +14,13 @@ class wtirler:
         #monte_carlo_method()
         i=1
 
-'''
     def generate_miu(self, policy):
         if policy == None:
-            #random play
+            return random_generate_pi()
         else:
             #run with policy
-'''
+
+
     def process(self, miu):
         self.tmiu = self.tmiu + ((miu - self.tmiu)*(self.miue - self.tmiu)/(miu - self.tmiu)*(miu - self.tmiu))*(miu - self.tmiu))
         w = self.miue - self.tmiu
