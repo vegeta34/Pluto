@@ -8,17 +8,21 @@ import numpy as np
 import gym
 import time
 import cv2
-import drl
+#import drl
+import os
+from irl import wtirler
+from collections import deque
 
 render = False
 GAMMA = 0.99
 STATE_NUM = 4
 
-# preprocess raw image to 80*80 gray image
+# preprocess raw image to 80*80 gray image to 6400 1D vector
 def preprocess(observation):
-	observation = cv2.cvtColor(cv2.resize(observation, (80, 80)), cv2.COLOR_BGR2GRAY)
-	ret, observation = cv2.threshold(observation,1,255,cv2.THRESH_BINARY)
-	return np.reshape(observation,(80,80,1))
+    observation = cv2.cvtColor(cv2.resize(observation, (80, 80)), cv2.COLOR_BGR2GRAY)
+    #ret, observation = cv2.threshold(observation,1,255,cv2.THRESH_BINARY)
+    #return np.reshape(observation,(80,80,1))
+    return np.reshape(observation,(6400,1))
 
 def prepro(I):
     """ prepro 210x160x3 uint8 frame into 6400 (80x80) 1D float vector """
@@ -81,35 +85,62 @@ def playGame():
         #brain.setPerception(nextObservation,action,reward,terminal)
 '''
 
-def process_expert_data(trajectories):
-    print len(trajectories)
-    m = len(trajectories)  #number of trajectories
-    miu = 0
-    for i = 1; ; i++:
-
-        currentState = np.stack((observation, observation, observation, observation), axis = 2)
-        for j = 0; j < len(trajectories[i]); j++:
-            currentState = np.append(currentState[:,:,1:],trajectories[i][j],axis = 2)
-            state = np.reshape(currentState,(25600))
-            miu += np.power(GAMMA, j) * state
-    miu = miu / m
+def process_expert_data():
+    miu = None
+    first_miu = True
+    miu_count = 0
+    for i in range(1, 100):
+        if os.path.exists('mldata/trajectory_%d' %(i)) == False:
+            break
+        miu_count += 1
+        #currentState = np.stack((observation, observation, observation, observation), axis = 2)
+        first_flag = True
+        current_state = deque()
+        count = 0
+        for j in range(0, 300):
+            imgpath = 'mldata/trajectory_%d/SM-N9200_0815f81337e81502/snapshot/l%d.jpg' %(i, j)
+            if os.path.exists(imgpath) == False:
+                continue
+            img = cv2.imread(imgpath)
+            img = preprocess(img)
+            if first_flag == True:
+                current_state.append(img)
+                current_state.append(img)
+                current_state.append(img)
+                current_state.append(img)
+                first_flag = False
+            else:
+                #current_state = np.append(current_state[:,:,1:],img,axis = 2)
+                current_state.append(img)
+                current_state.popleft()
+            state = np.array([current_state[0], current_state[1], current_state[2], current_state[2]])
+            state = np.reshape(state,(25600))
+            if first_miu == True:
+                miu = np.power(GAMMA, count) * state
+                first_miu = False
+            else:
+                miu = miu + np.power(GAMMA, count) * state
+            count += 1
+    miu = miu / miu_count
+    print miu.shape
     return miu
-    
+
+
 #inverse reinforcement algorithm
 def irl_process():
-    human_data = read_data_from_file()
-    miu_e = process_expert_data(human_data) #miu generated from human data
-    irl_processer = WTIRL(miu_e)
+    miu_e = process_expert_data() #miu generated from human data
+    irl_processer = wtirler(miu_e)
     miu = irl_processer.generate_miu(None)  #null means random play
     epsilon = 0.001
     t = 100
-    for True:
+    while True:
         w, t = irl_processer.process(miu)
         if t < epsilon:
             break
         pi = drl.playGame(w)  #using Reward function with parameter w
         miu_tmp = miu
         miu = irl_processer.generate_miu(pi)
+
 
 def main():
 	irl_process()
