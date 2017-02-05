@@ -5,7 +5,7 @@ from wetest import device
 import image
 from collections import deque
 
-MAX_STEPS = 128
+MAX_STEPS = 32
 MAX_REWARD_MEMORY_SIZE = 4
 
 #used to calculate reward
@@ -17,12 +17,14 @@ def getCurrentReward(reward_w):
 
 
 #play game using DRL
-def playGame(reward_w):
+def playGame(reward_w, brain):
     # Step 1: init BrainDQN
     #actions = 2
     actions = 80 * 80
     #brain = BrainDQN(actions)
-    brain = WTDQN(actions)
+    
+    #brain = WTDQN(actions)
+    
     # Step 2: init Game
     #env = gym.make("Pong-v0")
     #observation = env.reset()
@@ -76,4 +78,5 @@ def playGame(reward_w):
         #env.reset()
         #nextObservation = preprocess(nextObservation)
         #brain.setPerception(nextObservation,action,reward,terminal)
+    return miu
 
