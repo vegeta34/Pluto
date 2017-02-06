@@ -39,7 +39,8 @@ def playGame(reward_w, brain):
     observation0 = cv2.cvtColor(cv2.resize(observation, (80, 80)), cv2.COLOR_BGR2GRAY)
     ret, observation0 = cv2.threshold(observation0,1,255,cv2.THRESH_BINARY)
     #brain.setInitState(observation0)
-    brain.setInitState(observation0)
+    if not brain == None:
+        brain.setInitState(observation0)
     game_number = 0
     episode_number = 0
     start_time = time.time()
@@ -47,10 +48,14 @@ def playGame(reward_w, brain):
     running_reward = None
     # Step 3.2: run the game
     #while 1!= 0:
-    for:
+    for True:
         for i=0; i< MAX_STEPS; i++:
-            env.render()
-            action = brain.getAction()
+            #env.render()
+            if not brain == None:
+                action = brain.getAction()
+            else:
+                #random play, get a random action
+                action = random.randrange(actions)
             #nextObservation,reward,terminal = flappyBird.frame_step(action)
             #observation, reward, terminal, _ = env.step(action + 1)
             mydevice.action(action)

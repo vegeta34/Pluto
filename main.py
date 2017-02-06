@@ -10,12 +10,14 @@ import time
 import cv2
 #import drl
 import os
-from irl import wtirler
+import drl
+#from irl import wtirler
 from collections import deque
 
 render = False
 GAMMA = 0.99
 STATE_NUM = 4
+MAX_STEPS = 32
 
 # preprocess raw image to 80*80 gray image to 6400 1D vector
 def preprocess(observation):
@@ -125,21 +127,42 @@ def process_expert_data():
     print miu.shape
     return miu
 
+def randomplay():
+    actions = 80 * 80
+    mydevice = device.get_device()
+    mydevice.launch_app()
+    observation = mydevice.screenshot()
+    for i = 0; i < 8; i++:
+        for j = 0; j < MAX_STEPS; j++:
+            action = random.randrange(actions)
+            mydevice.takeaction(action)
+            mydevice.screenshot()
+
 
 #inverse reinforcement algorithm
 def irl_process():
     miu_e = process_expert_data() #miu generated from human data
-    irl_processer = wtirler(miu_e)
-    miu = irl_processer.generate_miu(None)  #null means random play
+    #irl_processer = wtirler(miu_e)
+    #miu = irl_processer.generate_miu(None)  #null means random play
+    miu = randomplay()
     epsilon = 0.001
     t = 100
+    tmiu = None
     while True:
-        w, t = irl_processer.process(miu)
+        #w, t = irl_processer.process(miu)
+        if tmiu == None:
+            tmiu = miu
+        else:
+            tmiu = tmiu + ((miu - tmiu)*(miue - tmiu)/(miu - tmiu)*(miu - tmiu))*(miu - tmiu)
+        w = miue - tmiu
+        t = np.float_power(np.sum(np.square(w)))
         if t < epsilon:
             break
-        pi = drl.playGame(w)  #using Reward function with parameter w
+        brain = WTDQN(actions)
+        drl.playGame(w, brain)  #using Reward function with parameter w
         miu_tmp = miu
-        miu = irl_processer.generate_miu(pi)
+
+        miu = drl.playGame(w, brain)
 
 
 def main():

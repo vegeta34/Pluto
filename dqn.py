@@ -23,6 +23,7 @@ class WTDQN:
         self.timeStep = 0
         self.epsilon = INITIAL_EPSILON
         self.actions = actions
+        self.gradiant_epsilon = 0.001
         # init Q network
         self.stateInput,self.QValue,self.W_conv1,self.b_conv1,self.W_conv2,self.b_conv2,self.W_conv3,self.b_conv3,self.W_fc1,self.b_fc1,self.W_fc2,self.b_fc2 = self.createQNetwork()
 
@@ -45,10 +46,14 @@ class WTDQN:
         else:
             print "Could not find old network weights"
 
+    def setGradiantEpsilon(self, gradiant):
+        self.gradiant_epsilon = gradiant
+
     def onGameOver(self):
         # change episilon
         if self.epsilon > FINAL_EPSILON and self.timeStep > OBSERVE:
-            self.epsilon -= (INITIAL_EPSILON - FINAL_EPSILON)/OBSERVE
+            #self.epsilon -= (INITIAL_EPSILON - FINAL_EPSILON)/OBSERVE
+            self.epsilon -= self.gradiant_epsilon
 
     def createQNetwork(self):
         # network weights

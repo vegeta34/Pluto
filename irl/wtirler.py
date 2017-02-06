@@ -10,16 +10,6 @@ class wtirler:
         #self.projection_length = 100
         self.miu_e = miue
 
-    def random_generate_pi(self):
-        #monte_carlo_method()
-        i=1
-
-    def generate_miu(self, policy):
-        if policy == None:
-            return random_generate_pi()
-        else:
-            #run with policy
-
 
     def process(self, miu):
         self.tmiu = self.tmiu + ((miu - self.tmiu)*(self.miue - self.tmiu)/(miu - self.tmiu)*(miu - self.tmiu))*(miu - self.tmiu))
