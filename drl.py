@@ -1,5 +1,5 @@
 
-from wt_drl import WTDQN
+from dqn import WTDQN
 import numpy as np
 from wetest import device
 import image
@@ -48,8 +48,8 @@ def playGame(reward_w, brain):
     running_reward = None
     # Step 3.2: run the game
     #while 1!= 0:
-    for True:
-        for i=0; i< MAX_STEPS; i++:
+    while True:
+        for i in range(0, MAX_STEPS):
             #env.render()
             if not brain == None:
                 action = brain.getAction()

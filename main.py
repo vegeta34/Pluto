@@ -11,6 +11,7 @@ import cv2
 #import drl
 import os
 import drl
+from wetest import device
 #from irl import wtirler
 from collections import deque
 
@@ -132,8 +133,8 @@ def randomplay():
     mydevice = device.get_device()
     mydevice.launch_app()
     observation = mydevice.screenshot()
-    for i = 0; i < 8; i++:
-        for j = 0; j < MAX_STEPS; j++:
+    for i in range(0, 8):
+        for j in range(0, MAX_STEPS):
             action = random.randrange(actions)
             mydevice.takeaction(action)
             mydevice.screenshot()

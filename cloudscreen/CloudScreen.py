@@ -15,12 +15,12 @@ SNAP_SHOT_MODE = '\001'
 MAX_TRIES = 3
 FORWARD_PORT = 40004
 PHONE_PORT = 25666
-PUSH_SCREENCAPTURE = "push ./cloudscreen /data/local/tmp/cloudscreen/cloudscreen"
-PUSH_SCREENCAPTURE_SO = "push ./libs/android-{0}/armeabi-v7a/cloudscreen.so /data/local/tmp/cloudscreen/cloudscreen"
+PUSH_SCREENCAPTURE = "push ./cloudscreen/cloudscreen /data/local/tmp/cloudscreen/cloudscreen"
+PUSH_SCREENCAPTURE_SO = "push ./cloudscreen/libs/android-{0}/armeabi-v7a/cloudscreen.so /data/local/tmp/cloudscreen/"
 CHMOD_SCREENCAPTURE = "shell chmod 777 /data/local/tmp/cloudscreen/cloudscreen"
 LAUNCH_SCREENCAPTURE = "shell LD_LIBRARY_PATH=/data/local/tmp/cloudscreen /data/local/tmp/cloudscreen/cloudscreen -w {0} -h {1}"
 LAUNCH_SCREENCAPTURE2 = "shell LD_LIBRARY_PATH=/data/local/tmp/cloudscreen /data/local/tmp/cloudscreen/cloudscreen -s -w {0} -h {1}"
-DEL_SCREENCAPTURE = "rm /data/local/tmp/cloudscreen"
+DEL_SCREENCAPTURE = "rm /data/local/tmp/cloudscreen/*"
 FORWARD = "forward tcp:{0} tcp:{1}".format(FORWARD_PORT, PHONE_PORT)
 REMOVE_FORWARD = "forward --remove tcp:{0}".format(FORWARD_PORT)
 
@@ -50,7 +50,7 @@ class CloudScreen(object):
             excute_adb(PUSH_SCREENCAPTURE)
             excute_adb(PUSH_SCREENCAPTURE_SO.format(self._get_version()))
             excute_adb(CHMOD_SCREENCAPTURE)
-            self.sub_process = excute_adb_process_daemon(LAUNCH_SCREENCAPTURE.format(width, height))
+            self.sub_process = excute_adb_process_daemon(LAUNCH_SCREENCAPTURE.format(width, height), True)
             excute_adb(FORWARD)
         self.testid = os.getenv("TESTID","1234")
         self.deviceid = os.getenv("DEVICEID", "1234")
